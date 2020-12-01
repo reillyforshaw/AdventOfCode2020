@@ -1,27 +1,34 @@
 #!/usr/bin/swift
 
 import Foundation
+import Darwin
+
+let scriptPath = CommandLine.arguments[0] as NSString
 
 guard CommandLine.arguments.count == 3 else {
-    fatalError("Must provide target and number of records")
+    print("usage: \(scriptPath.lastPathComponent) target number_of_records")
+    exit(1)
 }
 
 guard let target = Int(CommandLine.arguments[1]) else {
-    fatalError("Target must be an integer")
+    print("Target must be an integer")
+    exit(1)
 }
 
 guard let numberOfRecords = Int(CommandLine.arguments[2]), numberOfRecords > 0 else {
-    fatalError("Number of records must be an integer greater than 0")
+    print("Number of records must be an integer greater than 0")
+    exit(1)
 }
 
-let root = URL(fileURLWithPath: (CommandLine.arguments[0] as NSString).deletingLastPathComponent)
+let root = URL(fileURLWithPath: (scriptPath).deletingLastPathComponent)
 let inputURL = URL(fileURLWithPath: "1-ReportRepair-Input", relativeTo: root)
 
 guard
     let data = try? Data(contentsOf: inputURL),
     let input = String(data: data, encoding: .utf8)?.split(separator: "\n").map({ Int($0)! })
 else {
-    fatalError("Couldn't parse input")
+    print("Couldn't parse input")
+    exit(1)
 }
 
 /*
