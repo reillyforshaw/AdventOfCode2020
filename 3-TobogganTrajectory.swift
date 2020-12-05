@@ -40,7 +40,10 @@ struct Grid {
         return rowPattern[columnIndex]
     }
 
-    func positionAfterSteppingFrom(position previousPosition: Position, withSlope slope: Slope) -> Position? {
+    func positionAfterSteppingFrom(
+        position previousPosition: Position,
+        alongSlope slope: Slope
+    ) -> Position? {
         let row = previousPosition.row + slope.rise
         guard row < input.count else {
             return nil
@@ -51,16 +54,49 @@ struct Grid {
 }
 let grid = Grid(input: input)
 
-let slope = Grid.Slope(rise: 1, run: 3)
+
 var position = grid.origin
 
-var treeCount = 0
-while let nextPosition = grid.positionAfterSteppingFrom(position: position, withSlope: slope) {
-    position = nextPosition
+func countTrees(
+    in grid: Grid,
+    startingFrom startPosition: Grid.Position,
+    alongSlope slope: Grid.Slope
+) -> Int {
+    var position = startPosition
 
-    if grid[position] == "#" {
-        treeCount += 1
+    var treeCount = 0
+    while let nextPosition = grid.positionAfterSteppingFrom(position: position, alongSlope: slope) {
+        position = nextPosition
+
+        if grid[position] == "#" {
+            treeCount += 1
+        }
     }
+
+    return treeCount
 }
 
-print("Tree count with slope \(slope.rise):\(slope.run): \(treeCount)")
+func part1() {
+    let startPosition = grid.origin
+    let slope = Grid.Slope(rise: 1, run: 3)
+    let treeCount = countTrees(in: grid, startingFrom: startPosition, alongSlope: slope)
+
+    print("Part 1: Tree count along slope \(slope.rise):\(slope.run): \(treeCount)")
+}
+part1()
+
+func part2() {
+    let slopes: [Grid.Slope] = [
+        .init(rise: 1, run: 1),
+        .init(rise: 1, run: 3),
+        .init(rise: 1, run: 5),
+        .init(rise: 1, run: 7),
+        .init(rise: 2, run: 1),
+    ]
+    let treeCountAlongAllSlopes = slopes.reduce(1) {
+        $0 * countTrees(in: grid, startingFrom: grid.origin, alongSlope: $1)
+    }
+
+    print("Part 2: Tree count along all slopes: \(treeCountAlongAllSlopes)")
+}
+part2()
